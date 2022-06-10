@@ -216,8 +216,10 @@ fn main() {
     utils::init();
 
     // Help bottom panel
-    let help_win: help::Help = help::Help::new("F1 - Help, F10 - Exit".to_string(), false);
-    help_win.refresh();
+    let help_not_completed: &str = "F1 - Help, F10 - Exit, Backspace - Go back\n  Any alphabetic character - insert it";
+    let help_completed: &str = "F1 - Help, F10 - Exit, Backspace - Go back\n           Enter - Check the word";
+    let help_win: help::Help = help::Help::new(help_completed, false);
+    help_win.redraw(help_not_completed);
 
     // Main window
     let mut startx: i32 = center(COLS(), lb::LB_WIDTH * word_len, true);
@@ -245,6 +247,12 @@ fn main() {
     screen.refresh();
 
     loop {
+        if screen.x_focus >= screen.lines[screen.y_focus].lb.len() {
+            help_win.redraw(help_completed);
+        } else {
+            help_win.redraw(help_not_completed);
+        }
+
         let ch = getch();
         let ch_as_char: char = if ch < 256 {
             std::char::from_u32(ch as u32).unwrap_or('0')
@@ -261,7 +269,7 @@ fn main() {
             screen.refresh();
             help_win.refresh();
         } else if ch == KEY_F(1) {
-            if !secret_word.is_empty() {
+            if secret_word.is_empty() {
                 secret_word = rx.recv().unwrap();
             }
             help::detailed_help(debug, &secret_word);

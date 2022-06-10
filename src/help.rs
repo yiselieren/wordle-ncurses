@@ -14,11 +14,88 @@ use ncurses::*;
 pub struct Help {
     pub height: i32,
     pub width: i32,
+    print_legend: bool,
     win: WINDOW,
 }
 
 impl Help {
-    pub fn new(help_str: String, print_legend: bool) -> Self {
+    pub fn redraw(&self, help_str: &str) {
+        let help: Vec<String> = help_str.lines().map(|x| x.to_string()).collect();
+        let legend_lines = if self.print_legend { 3 } else { 1 };
+
+        wattrset(self.win, COLOR_PAIR(utils::HELP_COLOR));
+
+        // Print help
+        let mut y: i32 = 0;
+        for m in &help {
+            wmove(self.win, y, 0);
+            wclrtoeol(self.win);
+            mvwprintw(self.win, y, 0, m.as_str());
+            y += 1;
+        }
+
+        // Print legend
+        if self.print_legend {
+            let leg_offset: i32 = 8;
+            struct Leg<'a> {
+                relative_line: i32,
+                color: i16,
+                legend: &'a str,
+            }
+            let leg: Vec<Leg> = vec![
+                Leg {
+                    relative_line: 0,
+                    color: utils::HELP_COLOR,
+                    legend: "Legend: ",
+                },
+                Leg {
+                    relative_line: 0,
+                    color: utils::IN_PLACE_COLOR,
+                    legend: " X ",
+                },
+                Leg {
+                    relative_line: 0,
+                    color: utils::HELP_COLOR,
+                    legend: " - letter in a correct place",
+                },
+                Leg {
+                    relative_line: 1,
+                    color: utils::NOT_IN_PLACE_COLOR,
+                    legend: " X ",
+                },
+                Leg {
+                    relative_line: 1,
+                    color: utils::HELP_COLOR,
+                    legend: " - letter eixsts in the wrong place ",
+                },
+                Leg {
+                    relative_line: 2,
+                    color: utils::NOT_IN_WORD_COLOR,
+                    legend: " X ",
+                },
+                Leg {
+                    relative_line: 2,
+                    color: utils::HELP_COLOR,
+                    legend: " - letter doesn't exist in the word ",
+                },
+            ];
+            let mut x: i32 = 0;
+            let mut prev_line = 0;
+            for l in leg {
+                if l.relative_line != prev_line {
+                    x = leg_offset;
+                    y += 1;
+                    prev_line = l.relative_line;
+                }
+                wattrset(self.win, COLOR_PAIR(l.color));
+                mvwprintw(self.win, y, x, l.legend);
+                x += l.legend.len() as i32;
+            }
+        }
+        wrefresh(self.win);
+    }
+
+    pub fn new(help_str: &str, print_legend: bool) -> Self {
         let help: Vec<String> = help_str.lines().map(|x| x.to_string()).collect();
         let legend_lines = if print_legend { 3 } else { 1 };
         let height: i32 = help.len() as i32 + legend_lines;
@@ -38,74 +115,7 @@ impl Help {
                 0
             },
         );
-        wattrset(win, COLOR_PAIR(utils::HELP_COLOR));
-
-        // Print help
-        let mut y: i32 = 0;
-        for m in &help {
-            mvwprintw(win, y, 0, m.as_str());
-            y += 1;
-        }
-
-        // Print legend
-        if print_legend {
-            let leg_offset: i32 = 8;
-            struct Leg {
-                relative_line: i32,
-                color: i16,
-                legend: String,
-            }
-            let leg: Vec<Leg> = vec![
-                Leg {
-                    relative_line: 0,
-                    color: utils::HELP_COLOR,
-                    legend: "Legend: ".to_string(),
-                },
-                Leg {
-                    relative_line: 0,
-                    color: utils::IN_PLACE_COLOR,
-                    legend: " X ".to_string(),
-                },
-                Leg {
-                    relative_line: 0,
-                    color: utils::HELP_COLOR,
-                    legend: " - letter in a correct place".to_string(),
-                },
-                Leg {
-                    relative_line: 1,
-                    color: utils::NOT_IN_PLACE_COLOR,
-                    legend: " X ".to_string(),
-                },
-                Leg {
-                    relative_line: 1,
-                    color: utils::HELP_COLOR,
-                    legend: " - letter eixsts in the wrong place ".to_string(),
-                },
-                Leg {
-                    relative_line: 2,
-                    color: utils::NOT_IN_WORD_COLOR,
-                    legend: " X ".to_string(),
-                },
-                Leg {
-                    relative_line: 2,
-                    color: utils::HELP_COLOR,
-                    legend: " - letter doesn't exist in the word ".to_string(),
-                },
-            ];
-            let mut x: i32 = 0;
-            let mut prev_line = 0;
-            for l in leg {
-                if l.relative_line != prev_line {
-                    x = leg_offset;
-                    y += 1;
-                    prev_line = l.relative_line;
-                }
-                wattrset(win, COLOR_PAIR(l.color));
-                mvwprintw(win, y, x, l.legend.as_str());
-                x += l.legend.len() as i32;
-            }
-        }
-        Help { height, width, win }
+        Help { height, width, print_legend, win }
     }
 
     pub fn refresh(&self) {
