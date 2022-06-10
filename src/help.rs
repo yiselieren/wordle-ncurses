@@ -115,7 +115,12 @@ impl Help {
                 0
             },
         );
-        Help { height, width, print_legend, win }
+        Help {
+            height,
+            width,
+            print_legend,
+            win,
+        }
     }
 
     pub fn refresh(&self) {
@@ -207,7 +212,9 @@ pub fn detailed_help(debug: bool, secret_word: &str) {
         help_elements.push(HelpElement::NewLine);
         help_elements.push(HelpElement::NewLine);
         help_elements.push(HelpElement::Color(utils::HELP_COLOR));
-        help_elements.push(HelpElement::Text("       DEBUG MODE: The secret word is \""));
+        help_elements.push(HelpElement::Text(
+            "       DEBUG MODE: The secret word is \"",
+        ));
         help_elements.push(HelpElement::Text(secret_word));
         help_elements.push(HelpElement::Text("\""));
     }

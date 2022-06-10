@@ -216,8 +216,10 @@ fn main() {
     utils::init();
 
     // Help bottom panel
-    let help_not_completed: &str = "F1 - Help, F10 - Exit, Backspace - Go back\n  Any alphabetic character - insert it";
-    let help_completed: &str = "F1 - Help, F10 - Exit, Backspace - Go back\n           Enter - Check the word";
+    let help_not_completed: &str =
+        "F1 - Help, F10 - Exit, Backspace - Go back\n  Any alphabetic character - insert it";
+    let help_completed: &str =
+        "F1 - Help, F10 - Exit, Backspace - Go back\n           Enter - Check the word";
     let help_win: help::Help = help::Help::new(help_completed, false);
     help_win.redraw(help_not_completed);
 
