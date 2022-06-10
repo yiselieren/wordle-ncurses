@@ -143,7 +143,7 @@ fn check_word(s: &mut Screen, words: &[String], target_word: &str, debug_mode: b
         s.refresh();
         if w == *target_word {
             utils::msg(
-                "You win!".to_string(),
+                "You won!".to_string(),
                 format!(
                     "You guessed the right word\n\n          \"{}\"\n\n    From a {}'s attempt!",
                     w,
@@ -177,7 +177,7 @@ fn check_word(s: &mut Screen, words: &[String], target_word: &str, debug_mode: b
     } else {
         utils::msg(
             "You lost!".to_string(),
-            format!("The answer is:\n\n    \"{}\"", target_word),
+            format!("The word is:\n\n    \"{}\"", target_word),
             true,
         );
         true
@@ -194,7 +194,6 @@ fn main() {
     let words1_mtx = Arc::new(Mutex::new(words));
     let words2_mtx = Arc::clone(&words1_mtx);
     let mut secret_word: String = String::new();
-    let mut secret_word_received: bool = false;
 
     let (tx, rx) = channel();
     let prepare_handle = thread::spawn(move || {
@@ -262,18 +261,16 @@ fn main() {
             screen.refresh();
             help_win.refresh();
         } else if ch == KEY_F(1) {
-            if !secret_word_received {
+            if !secret_word.is_empty() {
                 secret_word = rx.recv().unwrap();
-                secret_word_received = true;
             }
             help::detailed_help(debug, &secret_word);
             screen.refresh();
             help_win.refresh();
         } else if ch == KEY_ENTER || ch_as_char == '\n' {
             if screen.x_focus >= screen.lines[screen.y_focus].lb.len() {
-                if !secret_word_received {
+                if secret_word.is_empty() {
                     secret_word = rx.recv().unwrap();
-                    secret_word_received = true;
                 }
 
                 if check_word(

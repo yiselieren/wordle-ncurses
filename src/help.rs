@@ -117,8 +117,8 @@ impl Help {
  * DETAILED HELP BIG  WINDOW
  * --------------------------
  */
-enum HelpElement {
-    Text(String),
+enum HelpElement<'a> {
+    Text(&'a str),
     Color(i16),
     Skip(i32),
     NewLine,
@@ -130,86 +130,83 @@ pub fn detailed_help(debug: bool, secret_word: &str) {
     let title = " Help ";
     let mut help_elements: Vec<HelpElement> = vec![
         HelpElement::Color(utils::NORM_COLOR),
-        HelpElement::Text("F1        - Display this help screen".to_string()),
+        HelpElement::Text("F1        - Display this help screen"),
         HelpElement::NewLine,
-        HelpElement::Text("F10       - Exit".to_string()),
+        HelpElement::Text("F10       - Exit"),
         HelpElement::NewLine,
-        HelpElement::Text("Enter     - ".to_string()),
+        HelpElement::Text("Enter     - "),
         HelpElement::SavePosition(0),
-        HelpElement::Text("Check word if it is completed, no action otherwise".to_string()),
+        HelpElement::Text("Check word if it is completed, no action otherwise"),
         HelpElement::NewLine,
-        HelpElement::Text("Backspace - ".to_string()),
+        HelpElement::Text("Backspace - "),
         HelpElement::SavePosition(0),
-        HelpElement::Text("Remove last letter in the word and move a focus backward".to_string()),
+        HelpElement::Text("Remove last letter in the word and move a focus backward"),
         HelpElement::NewLine,
         HelpElement::RestorePosition(0),
-        HelpElement::Text("works even if word is completed but no checked yet".to_string()),
+        HelpElement::Text("works even if word is completed but no checked yet"),
         HelpElement::NewLine,
         HelpElement::NewLine,
-        HelpElement::Text("Legend: ".to_string()),
+        HelpElement::Text("Legend: "),
         HelpElement::SavePosition(0),
         HelpElement::NewLine,
         HelpElement::RestorePosition(0),
         HelpElement::Color(utils::FOCUS_COLOR),
-        HelpElement::Text("| |".to_string()),
+        HelpElement::Text("| |"),
         HelpElement::Color(utils::NORM_COLOR),
-        HelpElement::Text(" - ".to_string()),
+        HelpElement::Text(" - "),
         HelpElement::SavePosition(1),
-        HelpElement::Text("This cell in a focus, any alphanumeric character".to_string()),
+        HelpElement::Text("This cell in a focus, any alphanumeric character"),
         HelpElement::NewLine,
         HelpElement::RestorePosition(1),
-        HelpElement::Text("pressed on keyboard will be inserterd to the cell".to_string()),
+        HelpElement::Text("pressed on keyboard will be inserterd to the cell"),
         HelpElement::NewLine,
         HelpElement::RestorePosition(0),
         HelpElement::Color(utils::NO_FOCUS_COLOR),
-        HelpElement::Text("|".to_string()),
+        HelpElement::Text("|"),
         HelpElement::Color(utils::NORM_COLOR),
-        HelpElement::Text("X".to_string()),
+        HelpElement::Text("X"),
         HelpElement::Color(utils::NO_FOCUS_COLOR),
-        HelpElement::Text("|".to_string()),
+        HelpElement::Text("|"),
         HelpElement::Color(utils::NORM_COLOR),
-        HelpElement::Text(" - ".to_string()),
+        HelpElement::Text(" - "),
         HelpElement::SavePosition(1),
-        HelpElement::Text("Letter in the cell but the word checking not performed yet".to_string()),
+        HelpElement::Text("Letter in the cell but the word checking not performed yet"),
         HelpElement::NewLine,
         HelpElement::RestorePosition(1),
-        HelpElement::Text("When word is completed the Enter will check the word.".to_string()),
+        HelpElement::Text("When word is completed the Enter will check the word."),
         HelpElement::NewLine,
         HelpElement::RestorePosition(0),
         HelpElement::Color(utils::IN_PLACE_COLOR),
-        HelpElement::Text(" X ".to_string()),
+        HelpElement::Text(" X "),
         HelpElement::Color(utils::NORM_COLOR),
-        HelpElement::Text(
-            " - Letter exists in the word and located in a correct place.".to_string(),
-        ),
+        HelpElement::Text(" - Letter exists in the word and located in a correct place."),
         HelpElement::NewLine,
         HelpElement::RestorePosition(0),
         HelpElement::Color(utils::NOT_IN_PLACE_COLOR),
-        HelpElement::Text(" X ".to_string()),
+        HelpElement::Text(" X "),
         HelpElement::Color(utils::NORM_COLOR),
-        HelpElement::Text(" - Letter exists in the word but located in a wrong place.".to_string()),
+        HelpElement::Text(" - Letter exists in the word but located in a wrong place."),
         HelpElement::NewLine,
         HelpElement::RestorePosition(0),
         HelpElement::Color(utils::NOT_IN_WORD_COLOR),
-        HelpElement::Text(" X ".to_string()),
+        HelpElement::Text(" X "),
         HelpElement::Color(utils::NORM_COLOR),
-        HelpElement::Text(" - Letter doesn't exist in the word".to_string()),
+        HelpElement::Text(" - Letter doesn't exist in the word"),
     ];
     if debug {
         help_elements.push(HelpElement::NewLine);
         help_elements.push(HelpElement::NewLine);
         help_elements.push(HelpElement::Color(utils::HELP_COLOR));
-        help_elements.push(HelpElement::Text(format!(
-            "       DEBUG MODE: The secret word is \"{}\"",
-            secret_word
-        )));
+        help_elements.push(HelpElement::Text("       DEBUG MODE: The secret word is \""));
+        help_elements.push(HelpElement::Text(secret_word));
+        help_elements.push(HelpElement::Text("\""));
     }
     let help_elements_rest: Vec<HelpElement> = vec![
         HelpElement::NewLine,
         HelpElement::NewLine,
         HelpElement::NewLine,
         HelpElement::Color(utils::HELP_COLOR),
-        HelpElement::Text("        Press any key to exit help screen".to_string()),
+        HelpElement::Text("        Press any key to exit help screen"),
         HelpElement::NewLine,
     ];
     for e in help_elements_rest {
@@ -285,7 +282,7 @@ pub fn detailed_help(debug: bool, secret_word: &str) {
                 position += n;
             }
             HelpElement::Text(s) => {
-                mvwprintw(win, y, position, s.as_str());
+                mvwprintw(win, y, position, s);
                 position += s.len() as i32;
             }
             HelpElement::NewLine => {
