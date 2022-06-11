@@ -32,7 +32,7 @@ pub struct Lb {
 
 impl Lb {
     pub fn new(border: bool, focus: bool, x: i32, y: i32) -> Self {
-        let win = utils::Win::new(String::new(), focus, LB_HEIGHT, LB_WIDTH, x, y);
+        let win = utils::Win::new("", focus, LB_HEIGHT, LB_WIDTH, x, y);
         Lb {
             win,
             border,

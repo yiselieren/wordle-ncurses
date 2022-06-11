@@ -143,20 +143,20 @@ fn check_word(s: &mut Screen, words: &[String], target_word: &str, debug_mode: b
         s.refresh();
         if w == *target_word {
             utils::msg(
-                "You won!".to_string(),
+                "You won!",
                 format!(
                     "You guessed the right word\n\n          \"{}\"\n\n    From a {}'s attempt!",
                     w,
                     s.y_focus + 1
-                ),
+                ).as_str(),
                 true,
             );
             return true;
         }
     } else {
         utils::msg(
-            format!("Word \"{}\"", w),
-            "Not in a dictionary".to_string(),
+            format!("Word \"{}\"", w).as_str(),
+            "Not in a dictionary",
             false,
         );
         s.refresh();
@@ -176,8 +176,8 @@ fn check_word(s: &mut Screen, words: &[String], target_word: &str, debug_mode: b
         false
     } else {
         utils::msg(
-            "You lost!".to_string(),
-            format!("The word is:\n\n    \"{}\"", target_word),
+            "You lost!",
+            format!("The word is:\n\n    \"{}\"", target_word).as_str(),
             true,
         );
         true
@@ -263,8 +263,8 @@ fn main() {
         };
         if ch == KEY_F(10) {
             if utils::yes_no(
-                "Exit confirmation".to_string(),
-                "Do you really want to quit from the wordle?".to_string(),
+                "Exit confirmation",
+                "Do you really want to quit from the wordle?",
             ) {
                 break;
             }

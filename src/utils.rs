@@ -80,7 +80,7 @@ pub struct Win {
 
 impl Win {
     pub fn new(
-        title_orig: String,
+        title_orig: &str,
         focus: bool,
         height: i32,
         width: i32,
@@ -88,7 +88,7 @@ impl Win {
         y_offs: i32,
     ) -> Self {
         let title: String = if title_orig.is_empty() {
-            title_orig
+            title_orig.to_string()
         } else {
             format!(" {} ", title_orig)
         };
@@ -156,7 +156,7 @@ impl Win {
         (self.ycurs, self.xcurs)
     }
 
-    pub fn print(&self, clear: bool, mut x: i32, mut y: i32, color: i16, msg: String) {
+    pub fn print(&self, clear: bool, mut x: i32, mut y: i32, color: i16, msg: &str) {
         if x < 0 {
             x = (self.width - LEFT_BW - RIGHT_BW) / 2;
         }
@@ -172,7 +172,7 @@ impl Win {
         }
         wmove(self.w, y, x);
         wattrset(self.w, COLOR_PAIR(color));
-        wprintw(self.w, &msg);
+        wprintw(self.w, msg);
         self.box_();
         wattrset(self.w, COLOR_PAIR(TITLE_COLOR));
         mvwprintw(
@@ -211,10 +211,10 @@ pub struct Yesnowin {
 }
 
 impl Yesnowin {
-    pub fn new(title: String, exit_msg: String) -> Self {
+    pub fn new(title: &str, exit_msg: &str) -> Self {
         let yesno_height = YESNO_HEIGHT;
         let win = Win::new(
-            title.clone(),
+            title,
             false,
             yesno_height,
             max(title.len() + 4, exit_msg.len()) as i32 + 6,
@@ -223,8 +223,8 @@ impl Yesnowin {
             (LINES() - TOP_BW - BOT_BW - yesno_height) / 2 + TOP_BW,
         );
         Yesnowin {
-            title,
-            exit_msg,
+            title: title.to_string(),
+            exit_msg: exit_msg.to_string(),
             win,
             yesno_height,
             yesno_width: YESNO_WIDTH,
@@ -244,14 +244,14 @@ impl Yesnowin {
                 (self.win.width - self.yesno_width) / 2,
                 self.yesno_line,
                 YESNO_SEL_COLOR,
-                "[ Yes ]".to_string(),
+                "[ Yes ]",
             );
             self.win.print(
                 false,
                 (self.win.width - self.yesno_width) / 2 + self.no_offs,
                 self.yesno_line,
                 YESNO_NSEL_COLOR,
-                "[ No ]".to_string(),
+                "[ No ]",
             );
         } else {
             self.win.print(
@@ -259,14 +259,14 @@ impl Yesnowin {
                 (self.win.width - self.yesno_width) / 2,
                 self.yesno_line,
                 YESNO_NSEL_COLOR,
-                "[ Yes ]".to_string(),
+                "[ Yes ]",
             );
             self.win.print(
                 false,
                 (self.win.width - self.yesno_width) / 2 + self.no_offs,
                 self.yesno_line,
                 YESNO_SEL_COLOR,
-                "[ No ]".to_string(),
+                "[ No ]",
             );
         }
         wmove(self.win.w, self.win.ycurs, self.win.xcurs);
@@ -276,7 +276,7 @@ impl Yesnowin {
     pub fn run(&mut self) -> bool {
         let p: PANEL = new_panel(self.win.w);
         self.win
-            .print(false, 2, 1, NORM_COLOR, self.exit_msg.clone());
+            .print(false, 2, 1, NORM_COLOR, self.exit_msg.as_str());
         self.draw_yesno();
         show_panel(p);
         loop {
@@ -306,7 +306,7 @@ impl Yesnowin {
         self.yes
     }
 }
-pub fn yes_no(title: String, exit_msg: String) -> bool {
+pub fn yes_no(title: &str, exit_msg: &str) -> bool {
     let mut ew: Yesnowin = Yesnowin::new(title, exit_msg);
     ew.run()
 }
@@ -325,7 +325,7 @@ pub struct Msgbox {
 }
 
 impl Msgbox {
-    pub fn new(title: String, msg_s: String, ok_box: bool) -> Self {
+    pub fn new(title: &str, msg_s: &str, ok_box: bool) -> Self {
         let msg: Vec<String> = msg_s.lines().map(|x| x.to_string()).collect();
         let mut msg_height: i32 = msg.len() as i32 + 2 + TOP_BW + BOT_BW;
         if ok_box {
@@ -340,9 +340,9 @@ impl Msgbox {
         msg_width += 2 + LEFT_BW + LEFT_BW;
         let msg_x: i32 = (COLS() - LEFT_BW - RIGHT_BW - msg_width) / 2 + LEFT_BW;
         let msg_y: i32 = (LINES() - TOP_BW - BOT_BW - msg_height) / 2 + TOP_BW;
-        let win = Win::new(title.clone(), false, msg_height, msg_width, msg_x, msg_y);
+        let win = Win::new(title, false, msg_height, msg_width, msg_x, msg_y);
         Msgbox {
-            title,
+            title: title.to_string(),
             msg,
             win,
             msg_height,
@@ -355,7 +355,7 @@ impl Msgbox {
         let p: PANEL = new_panel(self.win.w);
         let mut y: i32 = 1;
         for m in &self.msg {
-            self.win.print(false, 1, y, NORM_COLOR, m.clone());
+            self.win.print(false, 1, y, NORM_COLOR, m);
             y += 1;
         }
         if self.ok_box {
@@ -364,7 +364,7 @@ impl Msgbox {
                 (self.win.width - "[ OK ]".len() as i32) / 2,
                 y + 1,
                 YESNO_SEL_COLOR,
-                "[ OK ]".to_string(),
+                "[ OK ]",
             );
         }
         show_panel(p);
@@ -374,7 +374,7 @@ impl Msgbox {
         del_panel(p);
     }
 }
-pub fn msg(title: String, msg_s: String, ok_box: bool) {
+pub fn msg(title: &str, msg_s: &str, ok_box: bool) {
     let mut msg: Msgbox = Msgbox::new(title, msg_s, ok_box);
     msg.run();
 }
