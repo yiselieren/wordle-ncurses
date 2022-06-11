@@ -148,7 +148,8 @@ fn check_word(s: &mut Screen, words: &[String], target_word: &str, debug_mode: b
                     "You guessed the right word\n\n          \"{}\"\n\n    From a {}'s attempt!",
                     w,
                     s.y_focus + 1
-                ).as_str(),
+                )
+                .as_str(),
                 true,
             );
             return true;
