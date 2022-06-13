@@ -38,7 +38,7 @@ struct Opt {
     wlen: i32,
 
     /// Amount of attempts
-    #[structopt(short = "t", long = "tries", default_value = "5")]
+    #[structopt(short = "t", long = "tries", default_value = "6")]
     tries: i32,
 }
 

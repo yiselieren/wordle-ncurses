@@ -6,7 +6,8 @@ ncurses library and ncurses-Rust binding. Tested on Linux only.
 
 Unlike original game the word length and number of attempts are
 flexible and may be configured via command line (use "-h" command
-line parameter for details). The default is 5 like in the original game.
+line parameter for details). The default word lenght is 5 and the
+default number of attemps is 6 like in the original game.
 
 Thanks for the https://github.com/dwyl/english-words.git
 repository for English words database, I just used the words_alpha.txt
